@@ -28,14 +28,13 @@ def clientthread(conn, addr):
  
     # sends a message to the client whose user object is conn
     message = "Welcome to this chatroom!"
-    message = message.encode('utf-8')
-    conn.send(message)
+    conn.send(message.encode('utf-8'))
  
     while True:
             try:
                 message = conn.recv(2048)
                 if message:
- 
+                    message = message.decode('utf-8')
                     """prints the message and address of the
                     user who just sent the message on the server
                     terminal"""
@@ -46,11 +45,13 @@ def clientthread(conn, addr):
                     broadcast(message_to_send, conn)
  
                 else:
+                    print("ERROR, removing connection")
                     """message may have no content if the connection
                     is broken, in this case we remove the connection"""
                     remove(conn)
  
-            except:
+            except Exception as e: 
+                print(e)
                 continue
 
 
