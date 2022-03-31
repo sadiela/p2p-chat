@@ -5,6 +5,8 @@ import sqlite3
 from sqlite3 import Error
 
 rendezvous = ('10.192.49.109', 55555)
+connection_obj = sqlite3.connect('p2pchat.db')
+
 
 # connect to rendezvous
 print('connecting to rendezvous server')
