@@ -1,6 +1,8 @@
 import socket
 import sys
 import threading
+import sqlite3
+from sqlite3 import Error
 
 rendezvous = ('10.192.49.109', 55555)
 
@@ -27,6 +29,8 @@ print('\ngot peer')
 print('  ip:          {}'.format(ip))
 print('  source port: {}'.format(sport))
 print('  dest port:   {}\n'.format(dport))
+
+
 
 # punch hole
 # equiv: echo 'punch hole' | nc -u -p 50001 x.x.x.x 50002
