@@ -29,7 +29,7 @@ if __name__ == '__main__':
     cursor_obj.execute("DROP TABLE IF EXISTS CHAT")
     
     # Creating table
-    table = """ CREATE TABLE GEEK (
+    table = """ CREATE TABLE CHAT (
             SOURCE CHAR(255) NOT NULL,
             DEST CHAR(25) NOT NULL,
             MESSAGE VARCHAR(255),

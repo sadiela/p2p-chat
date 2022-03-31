@@ -4,6 +4,7 @@ import threading
 import sqlite3
 from sqlite3 import Error
 from datetime import datetime
+import sys
 
 rendezvous = ('10.192.49.109', 55555)
 # connect to your database
@@ -61,7 +62,7 @@ def listen():
         # ADD MESSAGE TO DB
         now = datetime.now()
         cur_time  = now.strftime("%m/%d/%Y, %H:%M:%S")
-        cur.execute(f'INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ({peer_ip}, {my_ip}, {data}, {cur_time})')
+        cur.execute(f"INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ('{peer_ip}', '{my_ip}', '{data}', '{cur_time}')")
         print('\rpeer: {}\n> '.format(data.decode()), end='')
 
 listener = threading.Thread(target=listen, daemon=True);
@@ -77,5 +78,8 @@ while True:
     # ADD MESSAGE TO DB
     now = datetime.now()
     cur_time  = now.strftime("%m/%d/%Y, %H:%M:%S")
-    cur.execute(f'INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ({my_ip}, {peer_ip}, {msg}, {cur_time})')
+    cur.execute(f"INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ('{my_ip}', '{peer_ip}', '{msg}', '{cur_time}')")
     sock.sendto(msg.encode(), (ip, sport))
+    if msg == 'exit':
+        connection_obj.commit()
+        sys.exit()
