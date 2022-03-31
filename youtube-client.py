@@ -3,10 +3,12 @@ import sys
 import threading
 import sqlite3
 from sqlite3 import Error
+from datetime import datetime
 
 rendezvous = ('10.192.49.109', 55555)
+# connect to your database
 connection_obj = sqlite3.connect('p2pchat.db')
-
+cur = connection_obj.cursor()
 
 # connect to rendezvous
 print('connecting to rendezvous server')
@@ -32,7 +34,8 @@ print('  ip:          {}'.format(ip))
 print('  source port: {}'.format(sport))
 print('  dest port:   {}\n'.format(dport))
 
-
+my_ip = str(socket.gethostbyname(socket.gethostname()))
+peer_ip = str(ip) # this will be used in DB writes
 
 # punch hole
 # equiv: echo 'punch hole' | nc -u -p 50001 x.x.x.x 50002
@@ -54,6 +57,11 @@ def listen():
 
     while True:
         data = sock.recv(1024)
+        data = data.decode()
+        # ADD MESSAGE TO DB
+        now = datetime.now()
+        cur_time  = now.strftime("%m/%d/%Y, %H:%M:%S")
+        cur.execute(f'INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ({peer_ip}, {my_ip}, {data}, {cur_time})')
         print('\rpeer: {}\n> '.format(data.decode()), end='')
 
 listener = threading.Thread(target=listen, daemon=True);
@@ -66,4 +74,8 @@ sock.bind(('0.0.0.0', dport))
 
 while True:
     msg = input('> ')
+    # ADD MESSAGE TO DB
+    now = datetime.now()
+    cur_time  = now.strftime("%m/%d/%Y, %H:%M:%S")
+    cur.execute(f'INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ({my_ip}, {peer_ip}, {msg}, {cur_time})')
     sock.sendto(msg.encode(), (ip, sport))
