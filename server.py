@@ -19,7 +19,7 @@ IP_address = str(sys.argv[1])
 Port = int(sys.argv[2])
 
 server.bind((IP_address, Port))
-
+#server.bind(('127.0.0.1', 55555))
 server.listen(100)
  
 list_of_clients = []

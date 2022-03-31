@@ -10,7 +10,8 @@ if len(sys.argv) != 3:
 IP_address = str(sys.argv[1])
 Port = int(sys.argv[2])
 server.connect((IP_address, Port))
- 
+#server.connect(('127.0.0.1', 55555))
+
 while True:
     # maintains a list of possible input streams
     sockets_list = [sys.stdin, server]
