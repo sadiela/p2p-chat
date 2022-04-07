@@ -1,21 +1,8 @@
 import socket
 import sys
 import threading
-import sqlite3
-from sqlite3 import Error
-from datetime import datetime
-import sys
 
-if len(sys.argv) != 3:
-    print ("Correct usage: script, IP address, port number")
-    exit()
-IP_address = str(sys.argv[1])
-Port = int(sys.argv[2])
-
-rendezvous = (IP_address, Port)
-# connect to your database
-connection_obj = sqlite3.connect('p2pchat.db')
-cur = connection_obj.cursor()
+rendezvous = ('10.192.49.109', 55555)
 
 # connect to rendezvous
 print('connecting to rendezvous server')
@@ -41,9 +28,6 @@ print('  ip:          {}'.format(ip))
 print('  source port: {}'.format(sport))
 print('  dest port:   {}\n'.format(dport))
 
-my_ip = str(socket.gethostbyname(socket.gethostname()))
-peer_ip = str(ip) # this will be used in DB writes
-
 # punch hole
 # equiv: echo 'punch hole' | nc -u -p 50001 x.x.x.x 50002
 print('punching hole')
@@ -59,17 +43,11 @@ print('ready to exchange messages\n')
 # equiv: nc -u -l 50001
 def listen():
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    print("PORT:", sport)
     sock.bind(('0.0.0.0', sport))
 
     while True:
         data = sock.recv(1024)
-        data = data.decode()
-        # ADD MESSAGE TO DB
-        now = datetime.now()
-        cur_time  = now.strftime("%m/%d/%Y, %H:%M:%S")
-        # cur.execute(f"INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ('{peer_ip}', '{my_ip}', '{data}', '{cur_time}')")
-        print('\rpeer: {}\n> '.format(data), end='')
+        print('\rpeer: {}\n> '.format(data.decode()), end='')
 
 listener = threading.Thread(target=listen, daemon=True);
 listener.start()
@@ -81,11 +59,4 @@ sock.bind(('0.0.0.0', dport))
 
 while True:
     msg = input('> ')
-    # ADD MESSAGE TO DB
-    now = datetime.now()
-    cur_time  = now.strftime("%m/%d/%Y, %H:%M:%S")
-    cur.execute(f"INSERT INTO CHAT(SOURCE, DEST, MESSAGE, TIME) VALUES ('{my_ip}', '{peer_ip}', '{msg}', '{cur_time}')")
     sock.sendto(msg.encode(), (ip, sport))
-    if msg == 'exit':
-        connection_obj.commit()
-        sys.exit()

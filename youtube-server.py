@@ -1,9 +1,16 @@
 import socket
+import sys
+
+
+if len(sys.argv) != 2:
+    print ("Correct usage: script, port number")
+    exit()
+Port = int(sys.argv[1])
 
 known_port = 50002
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-sock.bind(('0.0.0.0', 55555))
+sock.bind(('0.0.0.0', Port))
 
 while True:
     clients = []
